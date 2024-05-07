@@ -11,3 +11,9 @@ Everything you need to know to pass the PCPP1 exam by pythoninstitute.org
 - [Youtube: Python lists, sets, and tuples explained](https://www.youtube.com/watch?v=gOMW_n2-2Mw)
 - [Udemy: 6 Practice Exams by Paweł Krakowiak](https://www.udemy.com/course/become-a-certified-professional-in-python-programming-1-with-pcpp1/)
 - [Examtopics: Python Institute PCPP-32-101 Exam](https://www.examtopics.com/exams/python-institute/pcpp-32-101/)
+
+## Credly Badge
+[![Credly Badge](doc/images/badge.png)](https://www.credly.com/badges/efb5b4b1-47f8-4cd3-b497-6ab45b427232)
+
+
+
