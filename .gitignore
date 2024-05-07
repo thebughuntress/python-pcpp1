@@ -34,3 +34,6 @@
 *.swo
 *.synctex.gz
 .vscode/*
+
+# Exclude _minted-doc folder
+doc/_minted-doc/

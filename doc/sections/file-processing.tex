@@ -1,0 +1,977 @@
+\section{File Processing and Communicating with a Program’s Environment}
+
+
+\subsection{SQLite}
+\subsubsection{SQL}
+SQL (Structured Query Language) is a domain-specific language used in programming and managing relational databases. It provides a standardized way of interacting with databases for tasks such as querying data, modifying data, defining schema, and managing access control.
+
+\begin{itemize}
+    \item \textbf{SELECT}\\
+    The SELECT statement is used to retrieve data from one or more database tables. It can retrieve all columns, specific columns, or rows based on specified conditions.
+    \begin{codebox}
+    \begin{minted}{sql}
+    -- Select all columns from a table
+    SELECT * FROM table_name;
+
+    -- Select specific columns from a table
+    SELECT column1, column2 FROM table_name;
+
+    -- Select with conditions
+    SELECT * FROM table_name WHERE condition;
+    \end{minted}
+    \end{codebox}
+
+    \item \textbf{INSERT INTO}\\
+    The INSERT INTO statement is used to add new records (rows) into a table.
+    \begin{codebox}
+    \begin{minted}{sql}
+    -- Insert into all columns
+    INSERT INTO table_name VALUES (value1, value2, ...);
+
+    -- Insert into specific columns
+    INSERT INTO table_name (col1, col2, ...) VALUES (val1, val2, ...);
+    \end{minted}
+    \end{codebox}
+
+    \item \textbf{UPDATE}\\
+    The UPDATE statement is used to modify existing records in a table.
+    \begin{codebox}
+    \begin{minted}{sql}
+    -- Update values in a table
+    UPDATE table_name SET col1 = val1, col2 = val2 WHERE condition;
+    \end{minted}
+    \end{codebox}
+
+    \item \textbf{DELETE}\\
+    The DELETE statement is used to remove records from a table.
+    \begin{codebox}
+    \begin{minted}{sql}
+    -- Delete all records from a table
+    DELETE FROM table_name;
+
+    -- Delete specific records based on condition
+    DELETE FROM table_name WHERE condition;
+    \end{minted}
+    \end{codebox}
+\end{itemize}
+
+\subsubsection{SQLite}
+The sqlite module is a built-in library that allows developers to interact with SQLite databases. SQLite is a lightweight, serverless database engine that stores data in a single file, making it convenient for small to medium-scale applications.
+
+\subsubsection{Create a database}
+This Python script connects - or creates if necessary - to an SQLite database named \texttt{customer.db}, creates a table named \texttt{customers} with three columns \texttt{first\_name}, \texttt{last\_name} and \texttt{email}, inserts one row, and inserts multiple rows using parameterized queries. Finally, it commits changes and closes the connection.
+\begin{codebox}
+\begin{minted}{python}
+import sqlite3
+
+# Connect to database, creating it if it doesn't exist
+conn = sqlite3.connect('customer.db')
+
+# Create a cursor
+c = conn.cursor()
+
+# Create a table with 3 columns
+c.execute("""CREATE TABLE customers (
+    first_name TEXT,
+    last_name TEXT,
+    email TEXT
+)""")
+
+# Insert one row
+c.execute("""INSERT INTO customers VALUES 
+            ('John', 'Elder', 'john@codemy.com')""")
+
+# Insert multiple rows
+many_customers = [
+                 ('Alice', 'Smith', 'alice@example.com'),
+                 ('Bob', 'Johnson', 'bob@example.com'),
+                 ('Emma', 'Davis', 'emma@example.com'),
+            ]
+c.executemany("INSERT INTO customers VALUES (?,?,?)", many_customers)
+            
+# Commit command
+conn.commit()
+
+# Close the connection
+conn.close()
+\end{minted}
+\end{codebox}
+
+\begin{itemize}
+    \item \textbf{\texttt{c.execute()}:} Executes a single SQL statement. Takes a string containing the SQL statement as its argument.
+    
+    \item \textbf{\texttt{c.executemany()}:} Executes multiple SQL statements with varying parameter values. Takes two arguments: a string containing the SQL statement with placeholders for parameters, and a sequence (e.g., list, tuple, or iterable) containing the parameter values.
+    
+    \item \textbf{\texttt{conn.commit()}:} Commits the current transaction. This means that all the changes made in the transaction are permanently saved to the database.
+    
+    \item \textbf{\texttt{conn.close()}:} Closes the database connection. It's important to close the connection after you're done using it to free up resources and ensure proper cleanup.
+\end{itemize}
+
+
+\newpage
+\subsubsection{Data Types}
+SQLite supports the following data types:
+
+\begin{itemize}
+    \item \textbf{NULL}: Used to indicate a missing or unknown value.
+    \item \textbf{INTEGER}: Used for storing integer values.
+    \item \textbf{REAL}: Used for storing floating-point numbers. It stores approximate numeric values.
+    \item \textbf{TEXT}: Used for storing text strings, such as character data. It can store strings of any length.
+    \item \textbf{BLOB}: Used for storing binary data, such as images, audio, or other types of files, of any size.
+\end{itemize}
+
+\subsubsection{Query a Database}
+This Python script connects to an SQLite database named 'customer.db', queries the 'customers' table, fetches all data, prints it, commits changes, and closes the connection.
+\begin{codebox}
+\begin{minted}{python}
+import sqlite3
+
+conn = sqlite3.connect('customer.db')
+c = conn.cursor()
+
+# Query the databse
+c.execute("SELECT * FROM customers")
+
+#c.fetchone()
+#c.fetchmany(3)
+rows = c.fetchall()
+
+for row in rows:
+    print(row)
+
+conn.commit()
+conn.close()
+\end{minted}
+\end{codebox}
+
+\begin{itemize}
+    \item \textbf{\texttt{c.fetchone()}:} Retrieves the next single row from the result set.
+    \item \textbf{\texttt{c.fetchmany(n)}:} Retrieves the next set of rows, where \texttt{n} determines how many rows to fetch.
+    \item \textbf{\texttt{c.fetchall()}:} Retrieves all remaining rows from the result set and returns them as a list of tuples.
+\end{itemize}
+
+\newpage
+\subsubsection{Updating and Deleting Data}
+This code connects to an SQLite database file named "customer.db", creates a cursor object, updates all occurrences of 'John' to 'Tom' in the 'first\_name' column, deletes rows where the first name is 'Alice' and the last name is 'Smith', commits the changes, and finally closes the connection to the database.
+
+\begin{codebox}
+\begin{minted}{python}
+import sqlite3
+
+conn = sqlite3.connect('customer.db')
+c = conn.cursor()
+
+# Update 'John' to 'Tom'
+c.execute(
+    "UPDATE customers SET first_name = 'Tom' WHERE first_name = 'John'"
+)
+
+# Delete the rows where first name is 'Alice' and last name is 'Smith'
+c.execute("""DELETE FROM customers 
+             WHERE first_name = 'Alice' 
+             AND last_name = 'Smith'""")
+
+conn.commit()
+conn.close()
+\end{minted}
+\end{codebox}
+
+\textbf{Note:} The command \texttt{sqlite.connect()} creates a database if it doesn't exist.
+
+\subsubsection{Transaction Demarcation}
+Transaction demarcation refers to the delineation or boundary that separates one transaction from another within a database management system (DBMS). A transaction in this context is a sequence of operations (such as inserts, updates, or deletes) that are treated as a single logical unit of work.
+
+\newpage
+\subsection{JSON Files}
+JSON (JavaScript Object Notation) files are a popular data interchange format used to store and exchange data between different platforms and programming languages. They are human-readable and easy to parse, making them a common choice for configuration files, web APIs, and data exchange between client and server. JSON files consist of key-value pairs organized into objects and arrays. The official JSON specification, requires double quotes for string values.\\
+
+Here's a basic example of a JSON file:
+\begin{codebox}
+\begin{minted}{json}
+{
+  "name": "John Doe",
+  "age": 30,
+  "city": "New York",
+  "is_student": false,
+  "hobbies": ["reading", "traveling", "photography"],
+  "address": {
+    "street": "123 Main St",
+    "city": "Anytown",
+    "zip": "12345"
+  }
+}
+\end{minted}
+\end{codebox}
+
+\subsubsection{Serialization and Deserialization}
+\begin{itemize}    
+    \item \textbf{json.dump(data, file.json)}\\ This function is used to \textit{serialize} Python objects into a JSON formatted file. It takes two arguments: the Python object to be serialized and a file object to which the JSON data will be written.
+    
+    \item \textbf{json.load(data, file.json)}\\ This function is used to \textit{deserialize} a JSON file or string. It takes a file object or a string containing JSON data as input and returns a Python object (typically a dictionary or a list) representing the JSON data.
+    
+    \item \textbf{json.dumps(data)}\\ This function is used to \textit{serialize} Python objects into a JSON formatted string. It takes a Python object as input and returns a string containing the JSON data.
+    
+    \item \textbf{json.loads(data)}\\ This function is used to \textit{deserialize} a JSON string. It takes a string containing JSON data as input and returns a Python object representing the JSON data.
+\end{itemize}
+
+\begin{codebox}
+\begin{minted}{python}
+import json
+
+# JSON-formatted string
+json_string = '[4, 3, "5.5", true, null, "code", {"one": "uno"}]'
+
+# Deserialize JSON string into Python data structures
+data = json.loads(json_string)
+print(data) # [4, 3, '5.5', True, None, 'code', {'one': 'uno'}]
+\end{minted}
+\end{codebox}
+
+In this example, \texttt{json.loads()} parses the JSON data stored in the \texttt{json\_string} variable and returns the corresponding Python data structure, which is then stored in the variable \texttt{data}.
+
+\newpage
+\subsubsection{Conversion}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Type} & \textbf{Python} & \textbf{JSON} \\
+\hline
+Strings & \texttt{"hello" / 'hello'} & \textit{"hello" - wrapped in double quotes} \\
+\hline
+Numbers & \texttt{123} & \textit{No conversion needed} \\
+\hline
+Boolean Values & \texttt{True} / \texttt{False} & \texttt{true} / \texttt{false} \\
+\hline
+Sequence Types & Lists \texttt{[1, 2, 3]} / Tuples \texttt{(1, 2, 3)} & JSON arrays, represented by square brackets \\
+\hline
+Dictionaries & \texttt{\{"key": "value"\}} &  JSON objects, represented by curly braces \\
+\hline
+None / null & \texttt{None} & \texttt{null} \\
+\hline
+\end{tabular}
+\caption{Conversion of Python datatypes to JSON}
+\label{tab:conversion}
+\end{table}
+
+\subsubsection{Working with the \texttt{json} Module}
+\begin{codebox}
+\begin{minted}{python}
+import json 
+
+# Write the contents to the JSON file 'fruits.json'
+with open('fruits.json', 'w') as file:
+    data = []
+    banana = {'name': 'Banana', 'calories': 100}
+    data.append(banana)
+    json.dump(data, file)
+\end{minted}
+\end{codebox}
+
+Initially, a dictionary named \texttt{banana} with the keys \texttt{name} and \texttt{calories} is created. The dictionary is then appended to the list \texttt{data}. Subsequently, the list \texttt{data} is converted into JSON format using \texttt{json.dump()} and saved in the file \texttt{'fruits.json'}. 
+\begin{codebox}
+\begin{minted}{python}
+import json 
+
+# Read the contents from the JSON file 'fruits.json'
+with open('fruits.json', 'r') as file:
+    data = json.load(file)
+    print(data) # Output: [{'name': 'Banana', 'calories': 100}]
+    print(data[0]['name']) # Output: Banana
+\end{minted}
+\end{codebox}
+To read from this JSON file, \texttt{json.load()} is used. It deserializes the JSON data from \texttt{'fruits.json'} and returns a list with the \texttt{banana} dictionary representing the JSON object.
+
+
+\newpage
+\subsection{CSV Files}
+\subsubsection{Creating and Reading CSV Files}
+CSV (Comma-Separated Values) files are plain text files that store tabular data in a structured format. Each line in a CSV file typically represents a row of data, and within each line, individual values are separated by commas or other delimiters, such as semicolons or tabs. CSV files are widely used for storing and exchanging data between different systems because they are simple, lightweight, and easily readable by both humans and computers.
+
+\begin{codebox}
+\begin{minted}{python}
+import csv
+
+# Data to be written to the CSV file
+data = [
+    ['Name', 'Age', 'Major'],
+    ['Alice', 25, 'Computer Science'],
+    ['Bob', 30, 'Engineering'],
+    ['Charlie', 28, 'Mathematics'],
+    ['David', 35, 'Physics']
+]
+
+# Open the file in write mode
+with open('students.csv', 'w', newline='') as csvfile:
+    # Create a CSV writer object
+    writer = csv.writer(csvfile, delimiter=',')
+    
+    # Write the data to the CSV file
+    writer.writerows(data)
+
+print("CSV file 'students.csv' has been created successfully.")
+\end{minted}
+\end{codebox}
+
+\begin{codebox}
+\begin{minted}{python}
+import csv
+
+with open('students.csv', newline='') as csvfile:
+    reader = csv.DictReader(csvfile, delimiter=',')
+    print(f"Fieldnames: {reader.fieldnames}\n")
+    for row in reader:
+        for field, value in row.items():
+            print(f"{field}: {value}")
+        print()  # Print an empty line between each student's data
+\end{minted}
+\end{codebox}
+
+\subsubsection{Excel}
+Excel files are binary files created by Microsoft Excel or other spreadsheet software. They store data in a tabular format similar to CSV files but offer more features, such as formatting options, formulas, charts, and multiple sheets within a single file.
+
+CSV files and Excel files are related in the sense that you can import CSV files into Excel or export data from Excel to CSV format. This interchangeability makes CSV files a common format for exchanging data between different programs and platforms, including Excel. Excel provides built-in functionality to open and save CSV files, allowing users to work with CSV data directly in Excel or import/export data between Excel and other software applications that support CSV format.
+
+\newpage
+\subsubsection{Processing CSV Files}
+The \texttt{reader}, \texttt{writer}, \texttt{DictReader}, and \texttt{DictWriter} are classes provided by the \texttt{csv} module for reading and writing CSV files.
+
+\begin{itemize}
+    \item \texttt{reader}\\
+     This class is used for reading data from a CSV file. It provides a simple interface for iterating over the lines in the CSV file, where each line is represented as a list of fields.
+     
+\begin{codebox}
+\begin{minted}{python}
+import csv
+
+with open('data.csv', 'r') as file:
+    csv_reader = csv.reader(file)
+    for row in csv_reader:
+        print(row)
+\end{minted}
+\end{codebox}
+     
+    
+    \item \texttt{writer}\\
+     This class is used for writing data to a CSV file. It provides methods for writing rows of data to the CSV file.
+\begin{codebox}
+\begin{minted}{python}
+import csv
+
+with open('data.csv', 'w', newline='') as file:
+    csv_writer = csv.writer(file)
+    csv_writer.writerow(['Name', 'Age', 'Country'])
+    csv_writer.writerow(['Alice', 30, 'USA'])
+    csv_writer.writerow(['Bob', 25, 'Canada'])
+\end{minted}
+\end{codebox}
+    
+    \item \texttt{DictReader}\\
+    This class is similar to \texttt{reader}, but it returns each row as a dictionary where the keys are the field names and the values are the corresponding values in the row. This is useful when the CSV file has a header row.
+\begin{codebox}
+\begin{minted}{python}
+import csv
+
+with open('data.csv', 'r') as file:
+    csv_dict_reader = csv.DictReader(file)
+    for row in csv_dict_reader:
+        print(row['Name'], row['Age'], row['Country'])
+\end{minted}
+\end{codebox}
+    
+    \item \texttt{DictWriter}\\
+     This class is similar to \texttt{writer}, but it accepts dictionaries as input for writing rows. Each dictionary represents a row where keys correspond to field names.
+\begin{codebox}
+\begin{minted}{python}
+import csv
+
+with open('data.csv', 'w', newline='') as file:
+    fieldnames = ['Name', 'Age', 'Country']
+    csv_dict_writer = csv.DictWriter(file, fieldnames=fieldnames)
+    csv_dict_writer.writeheader()
+    csv_dict_writer.writerow(
+    {'Name': 'Alice', 'Age': 30, 'Country': 'USA'})
+    csv_dict_writer.writerow(
+    {'Name': 'Bob', 'Age': 25, 'Country': 'Canada'})
+\end{minted}
+\end{codebox}
+\end{itemize}
+
+
+\newpage
+\subsection{HTML / XML Documents}
+HTML (Hypertext Markup Language) and XML (eXtensible Markup Language) are both markup languages used for structuring and presenting information on the internet. While they have similarities, they serve different purposes and have different syntax.\\
+
+\textbf{HTML}
+\begin{itemize}[label=$\bullet$]
+  \item Used for creating web pages and web applications.
+  \item Focuses on defining the structure and presentation of content.
+  \item Contains predefined tags for elements like headings, paragraphs, lists, links, etc.
+  \item Supports hypertext links for navigation.
+  \item Often used in conjunction with CSS for styling.
+  \item Example:
+  \texttt{<h1>Hello, World!</h1>}
+\end{itemize}
+
+\textbf{XML}
+\begin{itemize}[label=$\bullet$]
+  \item Used for storing and transporting data.
+  \item Focuses on describing the structure and meaning of data.
+  \item Allows users to define custom tags to represent data.
+  \item Hierarchical structure with nested elements.
+  \item Platform and language agnostic, suitable for data exchange between systems.
+  \item Example:\\ 
+  \texttt{<book><title>The Kite Runner</title><author>Khaled Hosseini</author></book>}
+%\begin{minted}{xml}
+%<book>
+%	<title>The Great Gatsby</title>
+%	<author>F. Scott Fitzgerald</author>
+%</book>
+%\end{minted}
+\end{itemize}
+
+\subsubsection{Beautiful soup}
+Beautiful soup is a Python library used for web scraping, particularly for parsing and extracting data from HTML and XML documents. While it can be used in combination with other libraries to fetch data from servers, it is not the primary library for making HTTP requests.
+
+\begin{codebox}
+\begin{minted}{python}
+import requests
+from bs4 import BeautifulSoup
+
+# URL of the website you want to scrape
+url = 'https://docs.python.org/3/'
+
+# Sending a GET request to the URL
+response = requests.get(url)
+
+# Parsing the HTML content using BeautifulSoup
+soup = BeautifulSoup(response.text, 'html.parser')
+
+# Extracting the title of the webpage
+title = soup.title.string
+print("Title of the webpage:", title)
+\end{minted}
+\end{codebox}
+
+\subsubsection{Sample XML Document}
+\begin{codebox}
+\begin{minted}{xml}
+<?xml version="1.0" encoding="UTF-8"?>
+<library>
+    <book id="1">
+        <title>Animal Farm</title>
+        <author>George Orwell</author>
+        <genre>Dystopian Fiction</genre>
+        <year>1945</year>
+    </book>
+    <book id="2">
+        <title>7 Habits of Highly Effective People</title>
+        <author>Stephen R. Covey</author>
+        <genre>Self-help</genre>
+        <year>1989</year>
+    </book>
+    <book id="3">
+        <title>Rich Dad Poor Dad</title>
+        <author>Robert T. Kiyosaki</author>
+        <genre>Personal Finance</genre>
+        <year>1997</year>
+    </book>
+</library>
+\end{minted}
+\end{codebox}
+
+\subsubsection{Document Type Definition (DTD)}
+DTD and XML are two related concepts often used together to define and structure data in a document. DTD is a way to formally describe the structure and content of XML documents. It defines the rules that an XML document must follow. DTD specifies the elements and attributes that are allowed within the document, as well as their relationships and content types.
+
+\begin{codebox}
+\begin{minted}{dtd}
+<!DOCTYPE library [
+  <!ELEMENT library (book+)>
+  <!ELEMENT book (title, author, genre, year)>
+  <!ELEMENT title (#PCDATA)>
+  <!ELEMENT author (#PCDATA)>
+  <!ELEMENT genre (#PCDATA)>
+  <!ELEMENT year (#PCDATA)>
+]>
+\end{minted}
+\end{codebox}
+
+\newpage
+\subsubsection{The XML Tree Structure}
+
+XML can be visualized and understood as a tree structure. An XML tree structure is a hierarchical representation of XML data, where elements are organized in a parent-child relationship.
+
+% Define custom color
+\definecolor{xmlgreen}{RGB}{0,128,0}
+\definecolor{xmlred}{RGB}{186,33,33}
+\definecolor{xmlolive}{RGB}{105,120,33}
+
+\begin{itemize}
+    \item \textbf{Root Element}
+    \begin{itemize}
+        \item The topmost element in the XML document.
+        \item Acts as the parent element of all other elements.
+        \item There can be only one root element in an XML document.
+        \item Example: \textcolor{xmlgreen}{\texttt{<library>}}
+    \end{itemize}
+    
+    \item \textbf{Elements}
+    \begin{itemize}
+        \item Basic building blocks of an XML document.
+        \item Represented by tags enclosed in angle brackets (\texttt{<} and \texttt{>}).
+        \item Can contain other elements, text content, or attributes.
+        \item Example: \textcolor{xmlgreen}{\texttt{<book>}}
+    \end{itemize}
+    
+    \item \textbf{Parent-Child Relationships}
+    \begin{itemize}
+        \item Elements can contain other elements, creating a hierarchical structure.
+        \item The containing element is referred to as the parent, and the contained elements are its children.
+        \item Children are nested within their parent elements.
+        \item Example:
+        
+        \textcolor{xmlgreen}{\texttt{<book>}}
+        
+        \quad \texttt{\textcolor{xmlgreen}{<title>}Animal Farm\textcolor{xmlgreen}{</title>}}
+        
+        \quad \texttt{\textcolor{xmlgreen}{<author>}George Orwell\textcolor{xmlgreen}{</author>}}
+        
+   \textcolor{xmlgreen}{\texttt{</book>}}
+    \end{itemize}
+    
+    \item \textbf{Attributes:}
+    \begin{itemize}
+        \item Provide additional information about elements.
+        \item Attributes are specified within the start tag of an element.
+        \item Each attribute consists of a name and a value.
+        \item Example: \texttt{\textcolor{xmlgreen}{<book} \textcolor{xmlolive}{id=}\textcolor{xmlred}{"123"}\textcolor{xmlgreen}{>}}
+    \end{itemize}
+    
+    \item \textbf{Text Content}
+    \begin{itemize}
+        \item Elements can contain text content.
+        \item Text content is the data encapsulated within an element.
+        \item Text content is stored as a child node of the element in the XML tree.
+        \item Example: \texttt{\textcolor{xmlgreen}{<title>}Animal Farm\textcolor{xmlgreen}{</title>}}
+    \end{itemize}
+    
+    \item \textbf{Sibling Elements}
+    \begin{itemize}
+        \item Elements that share the same parent are called siblings.
+        \item Sibling elements are positioned at the same level within the XML hierarchy.
+        \item They have the same parent but different names or content.
+    \end{itemize}
+\end{itemize}
+
+\newpage
+\subsubsection{Parsing XML Files with \texttt{xml.etree.ElementTree}}
+Parsing XML in Python can be done using various libraries, but one of the most commonly used libraries is the built-in \texttt{xml.etree.ElementTree}. The \texttt{xml.etree.ElementTree} library provides a simple and efficient API for working with XML documents.
+
+\begin{itemize}
+    \item \textbf{Parsing XML}\\
+    It provides functions to parse XML documents into an ElementTree object, which represents the hierarchical structure of the XML document. This allows easy traversal and manipulation of XML elements.
+    
+    \item \textbf{Creating XML}\\
+    It allows the creation of new XML documents by constructing Element objects and building up the XML tree structure.
+    
+    \item \textbf{Navigating XML}\\
+    \texttt{ElementTree} provides methods like \texttt{find()}, \texttt{findall()}, and \texttt{iter()} to navigate through XML elements, search for specific elements, and iterate over elements efficiently.
+    
+    \item \textbf{Accessing Element Attributes and Text}\\
+    It provides methods to access attributes and text content of XML elements, making it easy to extract data from XML documents.
+    
+    \item \textbf{Modifying XML}\\
+    \texttt{ElementTree} allows modification of XML documents by adding, removing, or modifying elements and their attributes.
+    
+    \item \textbf{Serializing XML}\\
+    It supports serialization of the XML tree back into a string representation or writing it directly to a file.
+\end{itemize}
+
+\newpage
+\subsubsection{Searching Data with \texttt{find()} and \texttt{findall()}}
+The \texttt{find()} and \texttt{findall()} methods are used for searching and retrieving elements from an XML tree structure. Both methods traverse the XML tree starting from the element on which they are called and search through its descendants. They allow for efficient navigation and retrieval of elements based on their tag names. These methods are commonly used when processing XML data to extract specific information or manipulate the XML structure.
+
+\begin{codebox}
+\begin{minted}{python}
+import xml.etree.ElementTree as ET
+
+# Sample XML data
+xml_data = '''
+<people>
+    <person>
+        <name>John Doe</name>
+        <age>30</age>
+        <city>New York</city>
+    </person>
+    <person>
+        <name>Jane Smith</name>
+        <age>25</age>
+        <city>Los Angeles</city>
+    </person>
+</people>
+'''
+
+# Parse the XML data
+people = ET.fromstring(xml_data)
+
+# Iterate over each 'person' element
+for person in people.findall('person'):
+    name = person.find('name').text
+    age = int(person.find('age').text)
+    city = person.find('city').text
+    print(f"Name: {name}, Age: {age}, City: {city}")
+\end{minted}
+\end{codebox}
+
+In this example, \texttt{xml.etree.ElementTree} is used to parse the XML data. The \texttt{fromstring()} method is used to parse the XML string and return the root element. Then, \texttt{findall()} method is used to find all the 'person' elements within the root element, and for each 'person' element, \texttt{find()} method is used to find child elements like 'name', 'age', and 'city'. Finally, their text content is extracted using the \texttt{text} property.
+
+\newpage
+\subsubsection{XPath Expressions}
+XPath (XML Path Language) expressions are used to navigate through elements and attributes in an XML document. XPath provides a way to select nodes in an XML document by using a path-like syntax, similar to filesystem paths. XPath expressions can be used to pinpoint specific elements or attributes within an XML document based on their structure, content, or relationship to other elements.
+
+XPath expressions are widely used in XML processing technologies such as XSLT (Extensible Stylesheet Language Transformations), XQuery, and XML parsers like lxml in Python or XPath libraries in other programming languages.
+
+\begin{codebox}
+\begin{minted}{python}
+from lxml import etree
+
+# XML document string
+xml_string = """
+<universities>
+  <university name="Harvard University">
+    <location>Cambridge, MA</location>
+    <rank>1</rank>
+  </university>
+  <university name="Stanford University">
+    <location>Palo Alto, CA</location>
+    <rank>2</rank>
+  </university>
+  <university name="Massachusetts Institute of Technology (MIT)">
+    <location>Cambridge, MA</location>
+    <rank>3</rank>
+  </university>
+</universities>
+"""
+
+# Parse the XML string
+root = etree.fromstring(xml_string)
+
+# XPath expression to find names of all universities in "Cambridge, MA"
+xpath_expr = "/universities/university[location='Cambridge, MA']/@name"
+
+# Apply the XPath expression
+selected_universities = root.xpath(xpath_expr)
+
+# Print the selected university names
+for university in selected_universities:
+    print(university)
+\end{minted}
+\end{codebox}
+
+The XPath expression to select the names of all universities located in "Cambridge, MA" is:
+\textbf{\texttt{/universities/university[location='Cambridge, MA']/@name}}.\\
+
+The expression \textbf{\texttt{//university/@name}} selects the \texttt{name} attribute of all \texttt{<university>}-elements.
+
+\begin{itemize}
+    \item \texttt{//university} selects all \texttt{<university>} elements, regardless of their depth within the hierarchy. \texttt{//element} selects all elements at any level of the XML hierarchy.
+    \item \texttt{/@name} selects the \texttt{name} attribute of each selected \textless university\textgreater element.
+\end{itemize}
+
+
+
+
+
+\newpage
+\subsubsection{Building XML Documents using the \texttt{Element} Class and the \texttt{SubElement} Function}
+Creating XML documents can be done using the \texttt{Element} class and the \texttt{SubElement} function provided by the \texttt{xml.etree.ElementTree} module.
+
+\begin{itemize}
+    \item \textbf{Element class}
+    \begin{itemize}
+        \item The \texttt{Element} class represents an XML element.
+        \item It is used to create individual XML elements with specific tag names.
+        \item Syntax: \texttt{element = Element(tag)}, where \texttt{tag} is the name of the XML element.
+        \item Example: \texttt{person\_element = Element("person")}.
+    \end{itemize}
+    
+    \item \textbf{SubElement function}
+    \begin{itemize}
+        \item The \texttt{SubElement} function is used to create child elements and add them to a parent element.
+        \item It takes three parameters: the parent element, the tag name of the child element, and optional attributes for the child element.
+        \item Syntax: \texttt{SubElement(parent, tag, attrib=\{\})}.
+        \item Example: \texttt{name\_element = SubElement(person\_element, "name")}.
+    \end{itemize}
+\end{itemize}
+
+\begin{codebox}
+\begin{minted}{python}
+import xml.etree.ElementTree as ET
+
+# Create root element
+people = ET.Element("people")
+
+# Create first person element
+person1 = ET.SubElement(people, "person", id="1")
+person1.text = "John Doe"
+ET.SubElement(person1, "age").text = "30"
+ET.SubElement(person1, "city").text = "New York"
+
+# Create second person element
+person2 = ET.SubElement(people, "person", id="2")
+person2.text = "Jane Smith"
+ET.SubElement(person2, "age").text = "25"
+ET.SubElement(person2, "city").text = "Los Angeles"
+
+# Create ElementTree object
+tree = ET.ElementTree(people)
+
+# Write XML to file or print it
+tree.write("people.xml", encoding="utf-8", xml_declaration=True)
+\end{minted}
+\end{codebox}
+
+\newpage
+\subsection{Logging}
+Logging is a mechanism used to record events that occur during program execution. It allows developers to track the flow of their program, identify errors, and monitor its behavior.The documentation for logging in Python can be found \href{https://docs.python.org/3/library/logging.html}{here}.
+
+\begin{itemize}
+    \item \textbf{Importing the logging module}\\
+     Logging functionality is provided by the logging module, so the first step is usually to import it using \texttt{import logging}.
+    
+    \item \textbf{Configuring logging}\\
+     Before logging anything, you typically configure the logging system. This includes setting the logging level, specifying the logging format, and determining where log messages should be stored or displayed. The \texttt{basicConfig()} function is commonly used to configure logging settings.
+    
+    \item \textbf{Creating loggers}\\
+    Loggers are objects used to log messages. Each module or component in your program can have its own logger. You create a logger using \texttt{logging.getLogger(name)}, where \texttt{name} is typically the name of the module or component.
+    
+    \item \textbf{Logging messages}\\
+    After creating loggers, you can utilize various logging methods to record messages at different severity levels:
+    \begin{itemize}
+        \item \texttt{debug()}: Used for low-level system details or debugging information.
+        \item \texttt{info()}: Provides general informational messages about the system's operation.
+        \item \texttt{warning()}: Logs potential issues that do not necessarily disrupt the functionality
+        \item \texttt{error()}: Logs error messages for significant issues that affect the functionality.
+        \item \texttt{critical()}: Logs critical issues that require immediate attention.
+    \end{itemize}
+    \item \textbf{Logging levels:} CRITICAL - ERROR - WARNING - INFO - DEBUG - NOTSET
+\end{itemize}
+
+% https://docs.python.org/3/library/logging.html#logrecord-attributes
+
+\subsubsection{Configuration}
+The \texttt{basicConfig} enables quick setup of logging by specifying basic options like log format, output destination, and minimum logging level. LogRecord attributes can be found \href{https://docs.python.org/3/library/logging.html#logrecord-attributes}{here}.
+
+
+\begin{codebox}
+\begin{minted}{python}
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, filename="log.log", filemode="w",
+                    format="%(asctime)s - %(levelname)s - %(message)s")
+
+# Log messages at different levels
+logging.debug("debug")          # Displayed by default
+logging.info("info")            # Displayed if level is set to INFO or lower
+logging.warning("warning")      # Always displayed
+logging.error("error")          # Always displayed
+logging.critical("critical")    # Always displayed
+\end{minted}
+\end{codebox}
+
+\newpage
+\subsubsection{Logging Variables or Exceptions}
+This demonstrates basic logging functionality using the logging module.
+\begin{codebox}
+\begin{minted}{python}
+import logging
+
+# Setting up basic configuration for logging
+logging.basicConfig(level=logging.DEBUG, filename="log.log", filemode="w",
+                    format="%(asctime)s - %(levelname)s - %(message)s")
+
+# Logging a variable
+var = 2
+logging.debug(f"The value of var is {var}")
+
+# Logging an exception
+try:
+    1 / 0
+except ZeroDivisionError as e:
+    logging.error("Encountered a ZeroDivisionError", exc_info=True)
+    logging.exception("Encountered a ZeroDivisionError")
+\end{minted}
+\end{codebox}
+
+\subsubsection{Creating a Custom Logger, Handler and Formatter}
+This code sets up a custom logging configuration, which includes configuring a logger, defining a file handler to direct log messages to a separate file, specifying a custom log message format, and logging a test message to verify the setup.
+\begin{codebox}
+\begin{minted}{python}
+import logging
+
+# Configure the basic logging settings
+logging.basicConfig(level=logging.DEBUG, filename="log.log", filemode="w",
+                    format="%(asctime)s - %(levelname)s - %(message)s")
+
+# Creates a new logger if it doesn't already exist
+# Using __name__ as the logger name ensures uniqueness and context relevance
+logger = logging.getLogger(__name__)
+
+# Define a file handler for logging to a separate file
+handler = logging.FileHandler('tutorial.log')
+
+# Define a custom formatter for the file handler
+formatter = logging.Formatter(
+    '%(asctime)s -  %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
+# Add handler to the logger
+logger.addHandler(handler)
+
+# Log an informational message
+logger.info("Test the custom logger")
+\end{minted}
+\end{codebox}
+
+\subsubsection{LogRecord Attributes}
+
+The LogRecord has a number of attributes, most of which are derived from the parameters to the constructor. (Note that the names do not always correspond exactly between the LogRecord constructor parameters and the LogRecord attributes.) These attributes can be used to merge data from the record into the format string. The following table lists (in alphabetical order) the attribute names, their meanings, and the corresponding placeholder.
+
+\begin{longtable}{|l|l|p{8cm}|}
+\hline
+\textbf{Attribute} & \textbf{Format} & \textbf{Description} \\
+\hline
+args & Not formatted directly & Tuple of arguments merged into msg to produce message or dictionary values used for the merge (when only one argument and it is a dictionary). \\
+asctime & \%(asctime)s & Human-readable time when LogRecord was created (e.g., '2003-07-08 16:49:45,896' with millisecond portion after comma). \\
+created & \%(created)f & Time when LogRecord was created (as returned by time.time()). \\
+exc\_info & Not formatted directly & Exception tuple (à la sys.exc\_info) or None if no exception occurred. \\
+filename & \%(filename)s & Filename portion of pathname. \\
+funcName & \%(funcName)s & Name of function containing the logging call. \\
+levelname & \%(levelname)s & Text logging level for the message ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'). \\
+levelno & \%(levelno)s & Numeric logging level for the message (DEBUG, INFO, WARNING, ERROR, CRITICAL). \\
+lineno & \%(lineno)d & Source line number where logging call was issued (if available). \\
+message & \%(message)s & Logged message, computed as msg \% args. Set when Formatter.format() is invoked. \\
+module & \%(module)s & Module (name portion of filename). \\
+msecs & \%(msecs)d & Millisecond portion of time when LogRecord was created. \\
+msg & Not formatted directly & Format string passed in original logging call, merged with args to produce message. \\
+name & \%(name)s & Name of logger used to log the call. \\
+pathname & \%(pathname)s & Full pathname of source file where logging call was issued (if available). \\
+process & \%(process)d & Process ID (if available). \\
+processName & \%(processName)s & Process name (if available). \\
+relativeCreated & \%(relativeCreated)d & Time in milliseconds when LogRecord was created, relative to time the logging module was loaded. \\
+stack\_info & Not formatted directly & Stack frame information (where available) from bottom of stack in current thread, up to and including stack frame of logging call which resulted in creation of this record. \\
+thread & \%(thread)d & Thread ID (if available). \\
+threadName & \%(threadName)s & Thread name (if available). \\
+taskName & \%(taskName)s & asyncio.Task name (if available). \\
+\hline
+\end{longtable}
+LogRecord attributes can be found \href{https://docs.python.org/3/library/logging.html#logrecord-attributes}{here}.
+
+\newpage
+\subsection{INI Files}
+INI (initialization) files are simple text-based configuration files commonly used to store configuration settings for software applications. The name "INI" comes from the filename extension ".ini" often used for such files.\\
+
+INI files consist of sections, each containing key-value pairs that represent configuration settings. The format is straightforward, typically resembling the following:
+
+\begin{codebox}
+\begin{minted}{ini}
+[DEFAULT]
+host = localhost # This is a comment.
+ 
+[mariadb]
+name = hello
+user = user
+password = password
+ 
+[redis]
+port = 6379
+db = 0
+\end{minted}
+\end{codebox}
+
+
+\begin{itemize}
+    \item \textbf{Sections:} Sections are enclosed in square brackets ([]) and provide a way to group related configuration settings together. Sections help organize settings and prevent naming conflicts between keys.
+    \item \textbf{Keys and Values:} Each key-value pair represents a configuration setting. The key is separated from the value by an equal sign (=). Keys are unique within a section and are used to identify specific configuration options, while values represent the corresponding settings.
+\end{itemize}
+
+\subsubsection{Interpolating Values in .ini Files}
+Interpolating values in .ini files refers to the process of replacing placeholders or variables within the configuration file with actual values. This is commonly done to make configuration files more dynamic and reusable.
+
+For example, consider an .ini file with the following content:
+\begin{mdframed}[linewidth=1pt,linecolor=black,backgroundcolor=white]
+\begin{minted}{text}
+[Paths]
+base_path = /home/user
+data_path = %(base_path)s/data
+log_path = %(base_path)s/logs
+\end{minted}
+\end{mdframed}
+
+In this file, \texttt{\%()} syntax is used to define placeholders. When values are interpolated, the placeholders are replaced with the actual values they represent. For instance, if \texttt{base\_path} is \texttt{/home/user}, then after interpolation, \texttt{data\_path} will become \texttt{/home/user/data} and \textit{log\_path} will become \texttt{/home/user/logs}.
+
+Interpolating values in .ini files allows for more flexible and reusable configuration management, as it enables referencing and reusing values defined elsewhere in the configuration file. This can be particularly useful for managing paths, URLs, and other repetitive configurations.
+
+\newpage
+\subsubsection{The \texttt{configparser}}
+
+The \texttt{configparser} object is part of the standard library module \texttt{configparser}. It provides a way to work with configuration files in a consistent, easy-to-use manner. Configuration files are typically used to store settings and parameters for applications.
+
+\begin{codebox}
+\begin{minted}{python}
+from configparser import ConfigParser
+
+config = ConfigParser()
+
+config["Server"] = {
+    "hostname": "example.com",
+    "port": "8080",
+    "protocol": "http"
+}
+
+config["Database"] = {
+    "db_name": "example_db",
+    "db_user": "admin",
+    "db_password": "strong_password"
+}
+
+with open("app_config.ini", "w") as f:
+    config.write(f)
+\end{minted}
+\end{codebox}
+
+This creates the following INI File:
+\begin{mdframed}[linewidth=1pt,linecolor=black,backgroundcolor=white]
+\begin{minted}{text}
+[Server]
+hostname = example.com
+port = 8080
+protocol = http
+
+[Database]
+db_name = example_db
+db_user = admin
+db_password = strong_password
+\end{minted}
+\end{mdframed}
+
+\begin{codebox}
+\begin{minted}{python}
+from configparser import ConfigParser
+
+config = ConfigParser()
+config.read("app_config.ini")
+
+# Extracting configuration from the sections
+server_config = config["Server"]
+database_config = config["Database"]
+
+# Displaying configuration values
+print("Server Configuration:")
+print(f"Hostname: {server_config['hostname']}")
+print(f"Port: {server_config['port']}")
+print(f"Protocol: {server_config['protocol']}")
+\end{minted}
+\end{codebox}

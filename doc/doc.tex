@@ -1,0 +1,162 @@
+\documentclass[11pt,a4paper,titlepage]{article}
+\usepackage[margin=1in, headheight=14pt]{geometry} 
+\usepackage{txfonts}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{lipsum}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{blindtext}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{fontawesome}
+\usepackage{cleveref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{minted}
+\usepackage{mdframed}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{mindmap}
+\usetikzlibrary{positioning}
+\usepackage{pdfpages}
+\usepackage{longtable}
+\usepackage{mdframed}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ % Header
+\usepackage{fancyhdr}
+
+% Header and Footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{\textcolor{gray}{\leftmark}}
+\fancyfoot[C]{\thepage} % Page number in the center
+\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Redefine \section command to start on a new page
+\let\oldsection\section
+\renewcommand{\section}{\clearpage\oldsection}
+
+% Redefine the subsection command
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% GENERAL
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\graphicspath{ {./images/} }
+\renewcommand{\familydefault}{\sfdefault}
+
+\makeatletter
+\let\reftagform@=\tagform@
+\def\tagform@#1{\maketag@@@{(\ignorespaces\textcolor{red}{#1}\unskip\@@italiccorr)}}
+\makeatother
+\usepackage{hyperref}
+\usepackage{comment}
+\hypersetup{colorlinks=true}
+
+% Redefine itemize options
+\setlist[itemize]{itemsep=0pt,topsep=3pt,after=\vspace{0.5\baselineskip}}
+
+% TOC
+\hypersetup{%
+  colorlinks = true,
+  linkcolor  = black,
+  citecolor=black
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% COMMANDS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Custom command for line break with no indentation
+\newcommand{\nolineindent}{\\ \noindent}
+
+% Define a custom command to add space before textbf
+\newcommand{\spacedtextbf}[1]{\vspace{0.5em}\textbf{#1}}
+
+% Redefine \textbf{} to include \noindent
+\let\oldtextbf\textbf
+\renewcommand{\textbf}[1]{\noindent\oldtextbf{#1}}
+\newcommand{\defx}[2]{\vspace{1em}\textbf{#1} \\ #2}
+
+% Codebox
+\newmdenv[
+  skipabove=\topsep,
+  skipbelow=\topsep,
+  innerleftmargin=10pt,
+  innerrightmargin=10pt,
+  innertopmargin=5pt,
+  innerbottommargin=5pt,
+  backgroundcolor=gray!10,
+  linewidth=0pt,
+  linecolor=gray,
+  roundcorner=5pt,
+]{codebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CODE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\definecolor{commentColor}{rgb}{0.36, 0.54, 0.66}
+\definecolor{commentColor}{HTML}{008000}
+\definecolor{keywordColor}{HTML}{0000FF}
+\definecolor{stringColor}{HTML}{808080}
+\renewcommand{\lstlistingname}{Code}
+\lstdefinestyle{VSstyle}{%
+backgroundcolor=\color{gray!12},
+basicstyle=\ttfamily\small,
+commentstyle=\color{commentColor},
+keywordstyle=\color{keywordColor},
+stringstyle=\color{stringColor},
+showstringspaces=false,
+captionpos=b,
+numbers=left,
+numberstyle=\footnotesize\color{gray},
+numbersep= 10pt,
+%stepnumber=2,
+tabsize=2,
+%frame=TB,
+%framerule=1pt,
+breaklines=true,
+inputpath=code
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% TITLE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    \includegraphics[width=0.2\linewidth]{images/python.png}\par
+    \vspace{0.6cm}
+    {\Huge\bfseries Python\par}
+    \vspace{0.3cm}
+    {\Large\itshape PCPP1\par}
+    \vspace{1cm}
+    \vfill
+    \includegraphics[width=0.35\linewidth]{images/logo.png}\par
+    \vspace{0.5cm}
+    {\large\itshape \today\par}
+    {\large\itshape Antonia Frey\par}
+    \vspace*{2cm}
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% TOC
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setcounter{tocdepth}{2} % Rm subsubsections from TOC
+\tableofcontents
+\newpage
+\input{sections/fundamentals.tex}
+\input{sections/oop.tex}
+\input{sections/coding-conventions.tex}
+\input{sections/gui-programming.tex}
+\input{sections/network-programming.tex}
+\input{sections/file-processing.tex}
+\input{sections/pcpp1.tex}
+
+\end{document}
