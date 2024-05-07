@@ -1,0 +1,36 @@
+# LaTeX generated files
+*.aux
+*.log
+*.toc
+*.out
+*.synctex.gz
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.lol
+*.lot
+*.gz
+*.brf
+
+# LaTeX temporary files
+*.bak
+*.dvi
+*.idx
+*.ilg
+*.ind
+*.loa
+*.lof
+*.lot
+*.synctex(busy)
+*.synctex.gz(busy)
+*.toc
+*.gz(busy)
+
+# LaTeX editor specific files
+*.swp
+*.swo
+*.synctex.gz
+.vscode/*
