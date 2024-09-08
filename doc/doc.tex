@@ -22,6 +22,7 @@
 \usepackage{pdfpages}
 \usepackage{longtable}
 \usepackage{mdframed}
+\usepackage{afterpage}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  % Header
@@ -40,7 +41,12 @@
 \let\oldsection\section
 \renewcommand{\section}{\clearpage\oldsection}
 
-% Redefine the subsection command
+% Blank page
+\newcommand\blankpage{%
+    \null
+    \thispagestyle{empty}%
+    \addtocounter{page}{-1}%
+    \newpage}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -144,13 +150,15 @@ inputpath=code
     {\large\itshape Antonia Frey\par}
     \vspace*{2cm}
 \end{titlepage}
+\afterpage{\blankpage}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% TOC
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \setcounter{tocdepth}{2} % Rm subsubsections from TOC
 \tableofcontents
-\newpage
+\afterpage{\blankpage}
+
 \input{sections/fundamentals.tex}
 \input{sections/oop.tex}
 \input{sections/coding-conventions.tex}
